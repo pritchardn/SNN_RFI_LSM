@@ -1,0 +1,14 @@
+matplotlib
+numpy
+optuna
+optuna-integration[pytorch_lightning]
+optuna_dashboard
+pytorch_lightning
+scikit_learn
+snntorch
+torch==2.5.0+cu118
+tqdm
+onnx
+tensorboard
+lightning
+rockpool
