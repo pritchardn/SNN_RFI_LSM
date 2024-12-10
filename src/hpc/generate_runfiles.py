@@ -5,10 +5,11 @@ This script generates runfiles for supercomputer use.
 import os
 
 models = {
-    "FC": [
-        ("FC_LATENCY_ROCKPOOL", "LATENCY_FULL"),
-        ("FC_RATE_ROCKPOOL", "RATE_FULL"),
-        ("FC_ANN", "ANN"),
+    "LSM": [
+        ("LSM_LATENCY", "LATENCY_FULL"),
+        ("LSM_RATE", "RATE_FULL"),
+        ("LSM_DELTA", "DELTA_FULL"),
+        ("LSM_DIRECT", "DIRECT_FULL"),
     ]
 }
 datasets = ["HERA", "LOFAR"]

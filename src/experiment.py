@@ -34,10 +34,6 @@ from data.utils import reconstruct_patches
 from evaluation import final_evaluation
 from interfaces.data.raw_data_loader import RawDataLoader
 from interfaces.data.spiking_data_module import SpikeConverter
-from models.fc_ann import LitFcANN
-from models.fc_latency_rockpool import LitFcLatencyRockpool
-from models.fc_rate_rockpool import LitFcRateRockpool
-from models.fcp_latency_rockpool import LitFcLatencyPatchedRockpool
 
 
 def data_source_from_config(config: dict) -> RawDataLoader:
@@ -91,41 +87,7 @@ def model_from_config(config: dict) -> pl.LightningModule:
     tau_mem = config.get("tau_mem", 1.0)
     tau_syn = config.get("tau_syn", 1.0)
     learning_rate = config.get("learning_rate", 1e-3)
-    if model_type == "FC_ANN":
-        model = LitFcANN(num_inputs, num_hidden, num_outputs, num_layers, learning_rate)
-    elif model_type == "FC_LATENCY_ROCKPOOL":
-        model = LitFcLatencyRockpool(
-            num_inputs,
-            num_hidden,
-            num_outputs,
-            num_layers,
-            tau_mem,
-            tau_syn,
-            learning_rate,
-        )
-    elif model_type == "FC_RATE_ROCKPOOL":
-        model = LitFcRateRockpool(
-            num_inputs,
-            num_hidden,
-            num_outputs,
-            num_layers,
-            tau_mem,
-            tau_syn,
-            learning_rate,
-        )
-    elif model_type == "FCP_LATENCY_ROCKPOOL":
-        model = LitFcLatencyPatchedRockpool(
-            num_inputs,
-            num_hidden,
-            num_outputs,
-            num_layers,
-            tau_mem,
-            tau_syn,
-            learning_rate,
-        )
-    else:
-        raise NotImplementedError(f"Model type {model_type} is not supported.")
-    return model
+    raise NotImplementedError(f"Model type {model_type} is not supported.")
 
 
 def trainer_from_config(config: dict, root_dir: str, callbacks=None) -> pl.Trainer:
