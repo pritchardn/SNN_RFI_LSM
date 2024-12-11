@@ -31,6 +31,7 @@ from data.spike_converters.delta_exposure_converter import DeltaExposureSpikeCon
 from data.spike_converters.direct_converter import DirectSpikeConverter
 from data.spike_converters.rate_full_converter import RateFullSpikeConverter
 from data.utils import reconstruct_patches
+from models.lsm import LSM
 from evaluation import final_evaluation
 from interfaces.data.raw_data_loader import RawDataLoader
 from interfaces.data.spiking_data_module import SpikeConverter
@@ -79,15 +80,18 @@ def dataset_from_config(
 
 def model_from_config(config: dict) -> pl.LightningModule:
     model_type = config.get("type")
-    beta = config.get("beta")
     num_inputs = config.get("num_inputs")
     num_hidden = config.get("num_hidden")
     num_outputs = config.get("num_outputs")
-    num_layers = config.get("num_layers", 2)
-    tau_mem = config.get("tau_mem", 1.0)
-    tau_syn = config.get("tau_syn", 1.0)
-    learning_rate = config.get("learning_rate", 1e-3)
-    raise NotImplementedError(f"Model type {model_type} is not supported.")
+    if model_type == "LSM":
+        model = LSM(
+            num_inputs=num_inputs,
+            num_hidden=num_hidden,
+            num_outputs=num_outputs,
+        )
+        return model
+    else:
+        raise NotImplementedError(f"Model type {model_type} is not supported.")
 
 
 def trainer_from_config(config: dict, root_dir: str, callbacks=None) -> pl.Trainer:

@@ -5,7 +5,7 @@ This module contains the default configuration parameters for the different mode
 import copy
 import os
 
-DEFAULT_HERA_LATENCY = {
+DEFAULT_HERA_RATE = {
     "data_source": {
         "data_path": "./data",
         "limit": 1.0,
@@ -17,23 +17,18 @@ DEFAULT_HERA_LATENCY = {
         "batch_size": 36,
     },
     "model": {
-        "type": "FC_LATENCY_ROCKPOOL",
+        "type": "LSM",
         "num_inputs": 32,
         "num_hidden": 128,
         "num_outputs": 32,
-        "num_layers": 6,
-        "beta": 0.245507490258551,
-        "tau_mem": 1.0,
-        "tau_syn": 1.0,
-        "learning_rate": 1e-3,
     },
     "trainer": {
         "epochs": 100,
         "num_nodes": int(os.getenv("NNODES", 1)),
     },
     "encoder": {
-        "method": "LATENCY_FULL",
-        "exposure": 64,
+        "method": "RATE_FULL",
+        "exposure": 8,
         "tau": 1.0,
         "normalize": True,
     },
@@ -48,8 +43,8 @@ def get_default_params(
         delta_normalization: bool = False,
 ):
     if dataset == "HERA":
-        if model_type == "FC_LATENCY":
-            params = copy.deepcopy(DEFAULT_HERA_LATENCY)
+        if model_type == "LSM":
+            params = copy.deepcopy(DEFAULT_HERA_RATE)
         else:
             raise ValueError(f"Unknown model type {model_type}")
     elif dataset == "LOFAR":

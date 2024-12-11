@@ -14,9 +14,10 @@ class LatencyFullSpikeConverter(SpikeConverter):
     def encode_x(self, x_data: np.ndarray) -> np.ndarray:
         out_shape = (
             x_data.shape[0],
-            self.exposure * x_data.shape[-1],
+            self.exposure,
             x_data.shape[1],
-            x_data.shape[-1],
+            x_data.shape[2],
+            x_data.shape[3],
         )
         output = np.zeros(out_shape)
         for i, frame in enumerate(x_data):

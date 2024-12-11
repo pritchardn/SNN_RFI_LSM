@@ -58,7 +58,7 @@ def reconstruct_patches(images: np.array, original_size: int, kernel_size: int):
 
 
 def filter_noiseless_patches(
-    x_data: np.ndarray, y_data: np.ndarray
+        x_data: np.ndarray, y_data: np.ndarray
 ) -> (np.ndarray, np.ndarray):
     index_vales = np.any(y_data, axis=(1, 2, 3))
     out_x = x_data[index_vales]
@@ -149,8 +149,18 @@ def _decode_delta_inference_torch(spike_hat: torch.Tensor) -> torch.Tensor:
 
 
 def decode_delta_inference(
-    spike_hat, use_numpy: bool
+        spike_hat, use_numpy: bool
 ) -> Union[np.ndarray, torch.Tensor]:
     if use_numpy:
         return _decode_delta_inference_numpy(spike_hat)
     return _decode_delta_inference_torch(spike_hat)
+
+
+def test_train_split(data, masks, train_size: float = 0.8):
+    # Split the training data into training and test sets
+    train_size = int(train_size * data.shape[0])
+    indices = np.random.permutation(data.shape[0])
+    train_indices, test_indices = indices[:train_size], indices[train_size:]
+    train_x, test_x = data[train_indices], data[test_indices]
+    train_y, test_y = masks[train_indices], masks[test_indices]
+    return train_x, train_y, test_x, test_y

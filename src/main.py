@@ -9,7 +9,7 @@ from experiment import Experiment
 
 
 def main():
-    model_type = os.getenv("MODEL_TYPE", "FC_RATE_ROCKPOOL")
+    model_type = os.getenv("MODEL_TYPE", "LSM")
     dataset = os.getenv("DATASET", "HERA")
     num_hidden = int(os.getenv("NUM_HIDDEN", 128))
     num_layers = int(os.getenv("NUM_LAYERS", 2))

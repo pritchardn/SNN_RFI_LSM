@@ -9,6 +9,7 @@ from typing import Union
 import numpy as np
 from tqdm import tqdm
 
+from data.utils import test_train_split
 from interfaces.data.raw_data_loader import RawDataLoader
 
 
@@ -68,28 +69,16 @@ class HeraDataLoader(RawDataLoader):
         self.val_y = self.test_y.copy()
         self.limit_datasets()
 
-    def load_data(self, excluded_rfi: Union[str, None] = None):
-        if excluded_rfi is None:
-            rfi_models = []
-            file_path = os.path.join(self.data_dir, "HERA_04-03-2022_all.pkl")
-            train_x, train_y, test_x, test_y = np.load(file_path, allow_pickle=True)
-        else:
-            rfi_models = ["rfi_stations", "rfi_dtv", "rfi_impulse", "rfi_scatter"]
-            rfi_models.remove(excluded_rfi)
-            test_file_path = os.path.join(
-                self.data_dir, f"HERA_04-03-2022_{excluded_rfi}.pkl"
-            )
-            _, _, test_x, test_y = np.load(test_file_path, allow_pickle=True)
-
-            train_file_path = os.path.join(
-                self.data_dir, f'HERA_04-03-2022_{"-".join(rfi_models)}.pkl'
-            )
-            train_x, train_y, _, _ = np.load(train_file_path, allow_pickle=True)
-        self.train_x = np.moveaxis(train_x, 1, 2)
-        self.train_y = np.moveaxis(train_y, 1, 2)
-        self.test_x = np.moveaxis(test_x, 1, 2)
-        self.test_y = np.moveaxis(test_y, 1, 2)
-        self.rfi_models = rfi_models
+    def load_data(self):
+        file_path = os.path.join(self.data_dir, "HERA_21-11-2024_all.pkl")
+        data, _, masks = np.load(file_path, allow_pickle=True)
+        data = np.expand_dims(data[:, :, :, 0], -1)
+        masks = np.expand_dims(masks[:, :, :, 0], -1)
+        train_x, train_y, test_x, test_y = test_train_split(data, masks)
+        self.train_x = train_x
+        self.train_y = train_y
+        self.test_x = test_x
+        self.test_y = test_y
         self.original_size = self.train_x.shape[1]
         self._prepare_data()
         if self.patch_size:
