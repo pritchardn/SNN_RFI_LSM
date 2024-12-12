@@ -1,14 +1,24 @@
-import rockpool.nn.losses
-import torch
 import lightning.pytorch as pl
+import torch
+from decimal import Decimal, ROUND_HALF_UP
 from rockpool.nn.modules import LinearTorch, aLIFTorch
+from rockpool.weights.reservoirweights import rndm_ei_net
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from evaluation import calculate_metrics
 from interfaces.data.spiking_data_module import SpikeConverter
 
 
+def initialize_reservoir(num_exc, num_inh):
+    reservoir_weights = rndm_ei_net(num_exc, num_inh)
+    reservoir = aLIFTorch(num_exc + num_inh, learning_window=0.2, dt=0.001)
+    reservoir.w_rec = torch.tensor(reservoir_weights).float()
+    reservoir.w_ahp.requires_grad = False
+    return reservoir
+
+
 class LSM(pl.LightningModule):
+
     def __init__(self, num_inputs: int, num_hidden: int, num_outputs: int):
         super().__init__()
         self.converter = None
@@ -21,7 +31,8 @@ class LSM(pl.LightningModule):
         self.input_layer = LinearTorch((num_inputs, num_hidden))
         self.input_layer.weight.requires_grad = False
         self.output_layer = LinearTorch((num_hidden, num_outputs))
-        self.reservoir = aLIFTorch(num_hidden, learning_window=0.2, dt=0.001)
+        self.reservoir = initialize_reservoir(int(Decimal(num_hidden * 0.8).to_integral(rounding=ROUND_HALF_UP)),
+                                              int(Decimal(num_hidden * 0.2).to_integral(rounding=ROUND_HALF_UP)))
         self.reservoir.w_ahp.requires_grad = False
 
     def forward(self, x):
