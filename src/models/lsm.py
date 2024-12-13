@@ -14,6 +14,11 @@ def initialize_reservoir(num_exc, num_inh):
     reservoir = aLIFTorch(num_exc + num_inh, learning_window=0.2, dt=0.001)
     reservoir.w_rec = torch.tensor(reservoir_weights).float()
     reservoir.w_ahp.requires_grad = False
+    reservoir.bias.requires_grad = False
+    reservoir.tau_ahp.requires_grad = False
+    reservoir.tau_mem.requires_grad = False
+    reservoir.tau_syn.requires_grad = False
+    reservoir.threshold.requires_grad = False
     return reservoir
 
 
@@ -33,7 +38,6 @@ class LSM(pl.LightningModule):
         self.output_layer = LinearTorch((num_hidden, num_outputs))
         self.reservoir = initialize_reservoir(int(Decimal(num_hidden * 0.8).to_integral(rounding=ROUND_HALF_UP)),
                                               int(Decimal(num_hidden * 0.2).to_integral(rounding=ROUND_HALF_UP)))
-        self.reservoir.w_ahp.requires_grad = False
 
     def forward(self, x):
         x = self.input_layer(x)
@@ -44,14 +48,18 @@ class LSM(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
         spike_hat = self(x)
-        loss = self.loss(spike_hat, y)
+        pred = self.converter.decode_inference_training(spike_hat)
+        y_true = self.converter.decode_y(y)
+        loss = self.loss(pred, y_true)
         self.log("train_loss", loss, sync_dist=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
         spike_hat = self(x)
-        loss = self.loss(spike_hat, y)
+        pred = self.converter.decode_inference_training(spike_hat)
+        y_true = self.converter.decode_y(y)
+        loss = self.loss(pred, y_true)
         self.log("val_loss", loss, sync_dist=True)
 
     def test_step(self, batch, batch_idx):
