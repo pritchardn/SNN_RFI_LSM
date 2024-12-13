@@ -19,7 +19,7 @@ DEFAULT_HERA_RATE = {
     "model": {
         "type": "LSM",
         "num_inputs": 32,
-        "num_hidden": 128,
+        "num_hidden": 1024,
         "num_outputs": 32,
     },
     "trainer": {
