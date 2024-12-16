@@ -78,7 +78,7 @@ def dataset_from_config(
     return dataset
 
 
-def model_from_config(config: dict) -> pl.LightningModule:
+def model_from_config(config: dict, exposure: int) -> pl.LightningModule:
     model_type = config.get("type")
     num_inputs = config.get("num_inputs")
     num_hidden = config.get("num_hidden")
@@ -88,6 +88,7 @@ def model_from_config(config: dict) -> pl.LightningModule:
             num_inputs=num_inputs,
             num_hidden=num_hidden,
             num_outputs=num_outputs,
+            exposure=exposure
         )
         return model
     else:
@@ -202,7 +203,7 @@ class Experiment:
                     config.get("dataset"), self.data_source, self.encoder
                 )
         if self.configuration.get("model"):
-            self.model = model_from_config(config.get("model"))
+            self.model = model_from_config(config.get("model"), config.get("encoder").get("exposure"))
         if self.configuration.get("trainer"):
             self.trainer = trainer_from_config(
                 config.get("trainer"), self.root_dir, callbacks=self.callbacks
