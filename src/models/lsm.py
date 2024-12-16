@@ -9,9 +9,17 @@ from evaluation import calculate_metrics
 from interfaces.data.spiking_data_module import SpikeConverter
 
 
-def initialize_reservoir(num_exc, num_inh):
+def initialize_taus(num_exc, num_inh, exposure):
+    taus = torch.zeros(num_exc + num_inh)
+    taus[:num_exc] = exposure / 3
+    taus[num_exc:] = exposure
+    return taus
+
+
+def initialize_reservoir(num_exc, num_inh, exposure):
     reservoir_weights = rndm_ei_net(num_exc, num_inh)
-    reservoir = aLIFTorch(num_exc + num_inh, learning_window=0.2, dt=0.001)
+    taus = initialize_taus(num_exc, num_inh, exposure)
+    reservoir = aLIFTorch(num_exc + num_inh, learning_window=0.2, dt=0.001, tau_mem=taus)
     reservoir.w_rec = torch.tensor(reservoir_weights).float()
     reservoir.w_ahp.requires_grad = False
     return reservoir
@@ -19,7 +27,7 @@ def initialize_reservoir(num_exc, num_inh):
 
 class LSM(pl.LightningModule):
 
-    def __init__(self, num_inputs: int, num_hidden: int, num_outputs: int):
+    def __init__(self, num_inputs: int, num_hidden: int, num_outputs: int, exposure: int):
         super().__init__()
         self.converter = None
         self.learning_rate = 1e-4
@@ -32,7 +40,8 @@ class LSM(pl.LightningModule):
         self.input_layer.weight.requires_grad = False
         self.output_layer = LinearTorch((num_hidden, num_outputs))
         self.reservoir = initialize_reservoir(int(Decimal(num_hidden * 0.8).to_integral(rounding=ROUND_HALF_UP)),
-                                              int(Decimal(num_hidden * 0.2).to_integral(rounding=ROUND_HALF_UP)))
+                                              int(Decimal(num_hidden * 0.2).to_integral(rounding=ROUND_HALF_UP)),
+                                              exposure)
         self.reservoir.w_ahp.requires_grad = False
 
     def forward(self, x):
