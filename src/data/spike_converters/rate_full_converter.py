@@ -58,8 +58,7 @@ class RateFullSpikeConverter(SpikeConverter):
 
         # Reshape to the desired output shape (N, 1, F, T)
         output = mean_inference.transpose(0, 2, 1)[:, np.newaxis, :, :]
-        # This is cursed. I'm sorry.
-        return (torch.sigmoid(torch.from_numpy(output) - 0.5).numpy()).astype(np.float32)
+        return (output > 0.2).astype(np.float32)
 
     def decode_inference_training(self, inference: torch.Tensor):
         # Reshape to separate the 'exp' dimension
@@ -69,7 +68,7 @@ class RateFullSpikeConverter(SpikeConverter):
 
         # Calculate the mean across the 'exp' dimension
         mean_inference = reshaped.mean(axis=1)
-        return torch.sigmoid(mean_inference - 0.5)
+        return torch.sigmoid(mean_inference - 0.2)
 
     def decode_y(self, y_data: np.ndarray) -> np.ndarray:
         # Undo the encode_y operation
