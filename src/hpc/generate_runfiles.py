@@ -8,11 +8,10 @@ models = {
     "LSM": [
         ("LSM_LATENCY", "LATENCY_FULL"),
         ("LSM_RATE", "RATE_FULL"),
-        ("LSM_DELTA", "DELTA_FULL"),
         ("LSM_DIRECT", "DIRECT_FULL"),
     ]
 }
-datasets = ["HERA", "LOFAR"]
+datasets = ["HERA"]
 forwardstep_exposures = ["direct", "first", "latency"]
 delta_normalization = [True, False]
 
