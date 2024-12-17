@@ -90,15 +90,16 @@ class HeraDataLoader(RawDataLoader):
 class HeraDeltaNormLoader(RawDataLoader):
     def load_data(self):
         file_path = os.path.join(self.data_dir, "HERA_21-11-2024_all_delta_norm.pkl")
-        train_x, train_y, test_x, test_y, val_x, val_y = np.load(
+        data, masks = np.load(
             file_path, allow_pickle=True
         )
+        train_x, train_y, test_x, test_y = test_train_split(data, masks)
         self.train_x = train_x
         self.train_y = train_y
         self.test_x = test_x
         self.test_y = test_y
-        self.val_x = val_x
-        self.val_y = val_y
+        self.val_x = self.test_x.copy()
+        self.val_y = self.test_y.copy()
         self.limit_datasets()
         self.original_size = self.train_x.shape[-1]
         if self.patch_size:
