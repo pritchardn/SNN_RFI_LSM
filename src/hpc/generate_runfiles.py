@@ -50,11 +50,11 @@ export DELTA_NORMALIZATION="{delta_norm}"
 
 module load python/3.10.10
 
-cd /software/projects/pawsey0411/npritchard/setonix/2023.08/python/SNN-ROCKPOOL/src
+cd /software/projects/pawsey0411/npritchard/setonix/2023.08/python/SNN-SUPER-LSM/src
 source /software/projects/pawsey0411/npritchard/setonix/2023.08/python/snn-nln/bin/activate
 
 export DATA_PATH="/scratch/pawsey0411/npritchard/data"
-export OUTPUT_DIR="/scratch/pawsey0411/npritchard/outputs/snn-super-rockpool/${{MODEL_TYPE}}/${{ENCODER_METHOD}}/${{DATASET}}/${{DELTA_NORMALIZATION}}/${{NUM_HIDDEN}}/${{LIMIT}}"""
+export OUTPUT_DIR="/scratch/pawsey0411/npritchard/outputs/snn-super-lsm/${{MODEL_TYPE}}/${{ENCODER_METHOD}}/${{DATASET}}/${{DELTA_NORMALIZATION}}/${{NUM_HIDDEN}}/${{LIMIT}}"""
         + forward_step_directory
         + """
 export FI_CXI_DEFAULT_VNI=$(od -vAn -N4 -tu < /dev/urandom)
@@ -110,14 +110,14 @@ export DELTA_NORMALIZATION="{delta_norm}"
 
 module load python/3.10.10
 
-cd /software/projects/pawsey0411/npritchard/setonix/2023.08/python/SNN-ROCKPOOL/src
+cd /software/projects/pawsey0411/npritchard/setonix/2023.08/python/SNN-SUPER-LSM/src
 source /software/projects/pawsey0411/npritchard/setonix/2023.08/python/snn-nln/bin/activate
 
 export DATA_PATH="/scratch/pawsey0411/npritchard/data"
 export OPTUNA_DB=${{OPTUNA_URL}} # Need to change on super-computer before submitting\n"""
         + study_name
         + """
-export OUTPUT_DIR="/scratch/pawsey0411/npritchard/outputs/snn-super-rockpool/optuna/${MODEL_TYPE}/${ENCODER_METHOD}/${DATASET}/${DELTA_NORMALIZATION}/${NUM_HIDDEN}/${LIMIT}"""
+export OUTPUT_DIR="/scratch/pawsey0411/npritchard/outputs/snn-super-lsm/optuna/${MODEL_TYPE}/${ENCODER_METHOD}/${DATASET}/${DELTA_NORMALIZATION}/${NUM_HIDDEN}/${LIMIT}"""
         + forward_step_directory
         + """
 export FI_CXI_DEFAULT_VNI=$(od -vAn -N4 -tu < /dev/urandom)
