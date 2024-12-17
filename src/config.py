@@ -19,7 +19,7 @@ DEFAULT_HERA_RATE = {
     "model": {
         "type": "LSM",
         "num_inputs": 32,
-        "num_hidden": 1024,
+        "num_hidden": 8192,
         "num_outputs": 32,
     },
     "trainer": {
@@ -38,8 +38,6 @@ DEFAULT_HERA_RATE = {
 def get_default_params(
         dataset: str,
         model_type: str,
-        model_size: int = 128,
-        exposure_mode: str = None,
         delta_normalization: bool = False,
 ):
     if dataset == "HERA":

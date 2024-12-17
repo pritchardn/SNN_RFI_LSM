@@ -11,22 +11,20 @@ from experiment import Experiment
 def main():
     model_type = os.getenv("MODEL_TYPE", "LSM")
     dataset = os.getenv("DATASET", "HERA")
-    num_hidden = int(os.getenv("NUM_HIDDEN", 128))
     num_layers = int(os.getenv("NUM_LAYERS", 2))
     tau_mem = os.getenv("TAU_MEM", None)
     tau_mem = float(tau_mem) if tau_mem else None
     tau_syn = os.getenv("TAU_SYN", None)
     tau_syn = float(tau_syn) if tau_syn else None
-    exposure_mode = os.getenv("EXPOSURE_MODE", None)
     plot = os.getenv("PLOT", False) == "True"
     delta_normalization = os.getenv("DELTA_NORMALIZATION", False) == "True"
     config = get_default_params(
-        dataset, model_type, num_hidden, exposure_mode, delta_normalization
+        dataset, model_type, delta_normalization
     )
     config["data_source"]["data_path"] = os.getenv(
         "DATA_PATH", config["data_source"]["data_path"]
     )
-    # config["model"]["num_hidden"] = num_hidden
+    config["model"]["num_hidden"] = int(os.getenv("NUM_HIDDEN", config["model"]["num_hidden"]))
     config["model"]["num_layers"] = num_layers
     if tau_mem:
         config["model"]["tau_mem"] = tau_mem
