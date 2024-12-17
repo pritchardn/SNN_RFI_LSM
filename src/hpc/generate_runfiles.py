@@ -6,9 +6,9 @@ import os
 
 models = {
     "LSM": [
-        ("LSM_LATENCY", "LATENCY_FULL"),
-        ("LSM_RATE", "RATE_FULL"),
-        ("LSM_DIRECT", "DIRECT_FULL"),
+        ("LSM", "LATENCY_FULL"),
+        ("LSM", "RATE_FULL"),
+        ("LSM", "DIRECT_FULL"),
     ]
 }
 datasets = ["HERA"]
