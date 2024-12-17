@@ -89,7 +89,7 @@ class HeraDataLoader(RawDataLoader):
 
 class HeraDeltaNormLoader(RawDataLoader):
     def load_data(self):
-        file_path = os.path.join(self.data_dir, "HERA-04-03-2022_all_delta_norm.pkl")
+        file_path = os.path.join(self.data_dir, "HERA_21-11-2024_all_delta_norm.pkl")
         train_x, train_y, test_x, test_y, val_x, val_y = np.load(
             file_path, allow_pickle=True
         )
