@@ -93,6 +93,8 @@ class HeraDeltaNormLoader(RawDataLoader):
         data, masks = np.load(
             file_path, allow_pickle=True
         )
+        data = np.expand_dims(data[:, 0, :, :], 1)
+        masks = np.expand_dims(masks[:, 0, :, :], 1)
         train_x, train_y, test_x, test_y = test_train_split(data, masks)
         self.train_x = train_x
         self.train_y = train_y
