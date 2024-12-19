@@ -111,7 +111,7 @@ class LSM(pl.LightningModule):
         spike_hat, _, _ = self(x)
         # Convert output to true output
         output_pred = self.converter.decode_inference(spike_hat.detach().cpu().numpy())
-        y_true = self.converter.decode_y(y.detach().cpu().numpy())
+        y_true = y.detach().cpu().numpy()
         accuracy, mse, auroc, auprc, f1 = calculate_metrics(y_true, output_pred)
         self.log("test_accuracy", accuracy, sync_dist=True)
         self.log("test_mse", mse, sync_dist=True)
