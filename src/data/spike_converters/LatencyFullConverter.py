@@ -6,6 +6,8 @@ from interfaces.data.spiking_data_module import SpikeConverter
 
 
 class LatencyFullSpikeConverter(SpikeConverter):
+
+
     def __init__(self, exposure: int, tau: float, normalize: bool):
         self.exposure = exposure
         self.tau = tau
@@ -47,8 +49,16 @@ class LatencyFullSpikeConverter(SpikeConverter):
         :return: [N, C, freq, time]
         """
         reshaped = inference.reshape(inference.shape[0], self.exposure, inference.shape[-1], inference.shape[-1])
-        return reshaped[:, :-1, :, :].sum(axis=1)
+        return np.expand_dims(reshaped[:, :-1, :, :].sum(axis=1), axis=1)
+
+    def decode_inference_training(self, inference: torch.Tensor) -> torch.Tensor:
+        reshaped = inference.reshape(inference.shape[0], self.exposure, inference.shape[-1],
+                                     inference.shape[-1])
+        return reshaped[:, :-1, :, :].sum(dim=1)
 
     def decode_y(self, y_data: np.ndarray) -> np.ndarray:
-        return y_data
+        if isinstance(y_data, torch.Tensor):
+            return self.decode_inference_training(y_data)
+        else:
+            return self.decode_inference(y_data)
 
