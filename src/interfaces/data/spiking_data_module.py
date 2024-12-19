@@ -5,6 +5,7 @@ This module contains the interface for the spike data converter.
 from abc import ABC, abstractmethod
 
 import numpy as np
+import torch
 
 
 class SpikeConverter(ABC):
@@ -24,4 +25,8 @@ class SpikeConverter(ABC):
 
     @abstractmethod
     def decode_inference(self, inference: np.ndarray) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def decode_inference_training(self, inference: torch.Tensor) -> torch.Tensor:
         pass
