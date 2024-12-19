@@ -29,6 +29,7 @@ from data.spike_converters import (
 from data.spike_converters.LatencyFullConverter import LatencyFullSpikeConverter
 from data.spike_converters.delta_exposure_converter import DeltaExposureSpikeConverter
 from data.spike_converters.direct_converter import DirectSpikeConverter
+from data.spike_converters.rate_full_balanced_converter import RateFullBalancedSpikeConverter
 from data.spike_converters.rate_full_converter import RateFullSpikeConverter
 from data.utils import reconstruct_patches
 from models.lsm import LSM
@@ -147,6 +148,9 @@ def encoder_from_config(config: dict) -> SpikeConverter:
     elif config.get("method") == "RATE_FULL":
         exposure = config.get("exposure")
         encoder = RateFullSpikeConverter(exposure=exposure)
+    elif config.get("method") == "RATE_FULL_BALANCED":
+        exposure = config.get("exposure")
+        encoder = RateFullBalancedSpikeConverter(exposure=exposure)
     elif config.get("method") == "DELTA":
         threshold = config.get("threshold")
         off_spikes = config.get("off_spikes")
