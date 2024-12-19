@@ -56,8 +56,17 @@ class DirectSpikeConverter(SpikeConverter):
 
         # Reshape to the desired output shape (N, 1, F, T)
         output = mean_inference.transpose(0, 2, 1)[:, np.newaxis, :, :]
+        return (output > 0.2).astype(np.float32)
 
-        return (output > 0.01).astype(np.float32)
+    def decode_inference_training(self, inference: torch.Tensor):
+        # Reshape to separate the 'exp' dimension
+        N, exp_T, C = inference.shape
+        T = exp_T // self.exposure
+        reshaped = inference.reshape(N, self.exposure, T, C)
+
+        # Calculate the mean across the 'exp' dimension
+        mean_inference = reshaped.mean(axis=1)
+        return torch.sigmoid(mean_inference - 0.2)
 
     def decode_y(self, y_data: np.ndarray) -> np.ndarray:
         # Undo the encode_y operation
