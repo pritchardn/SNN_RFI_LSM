@@ -9,6 +9,7 @@ models = {
         ("LSM", "LATENCY_FULL"),
         ("LSM", "RATE_FULL"),
         ("LSM", "DIRECT_FULL"),
+        ("LSM", "RATE_FULL_BALANCED"),
     ]
 }
 datasets = ["HERA"]
