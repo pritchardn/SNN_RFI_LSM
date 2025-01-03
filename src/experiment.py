@@ -32,7 +32,7 @@ from data.spike_converters.direct_converter import DirectSpikeConverter, DirectS
 from data.spike_converters.rate_full_balanced_converter import RateFullBalancedSpikeConverter
 from data.spike_converters.rate_full_converter import RateFullSpikeConverter
 from data.utils import reconstruct_patches
-from models.lsm import LSM
+from models.lsm import LSM, LSM3D
 from evaluation import final_evaluation
 from interfaces.data.raw_data_loader import RawDataLoader
 from interfaces.data.spiking_data_module import SpikeConverter
@@ -84,12 +84,23 @@ def model_from_config(config: dict, exposure: int) -> pl.LightningModule:
     num_inputs = config.get("num_inputs")
     num_hidden = config.get("num_hidden")
     num_outputs = config.get("num_outputs")
+    p_in = config.get("probability_in")
     if model_type == "LSM":
         model = LSM(
             num_inputs=num_inputs,
             num_hidden=num_hidden,
             num_outputs=num_outputs,
-            exposure=exposure
+            exposure=exposure,
+            p_in=p_in
+        )
+        return model
+    elif model_type == "LSM_3D":
+        model = LSM3D(
+            num_inputs=num_inputs,
+            num_hidden=num_hidden,
+            num_outputs=num_outputs,
+            exposure=exposure,
+            p_in=p_in
         )
         return model
     else:
