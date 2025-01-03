@@ -51,7 +51,7 @@ DEFAULT_3D_HERA_DIRECT_SINGLE = {
         "num_inputs": 32,
         "num_hidden": 16,  # Gets turned into 16 ** 3 = 4096
         "num_outputs": 32,
-        "probability_in": 1.0,
+        "probability_in": 0.25,
     },
     "trainer": {
         "epochs": 100,
@@ -59,7 +59,7 @@ DEFAULT_3D_HERA_DIRECT_SINGLE = {
     },
     "encoder": {
         "method": "DIRECT_SINGLE",
-        "exposure": 16,
+        "exposure": 4,
         "tau": 1.0,
         "normalize": True,
     },

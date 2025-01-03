@@ -10,6 +10,14 @@ models = {
         ("LSM", "RATE_FULL"),
         ("LSM", "DIRECT_FULL"),
         ("LSM", "RATE_FULL_BALANCED"),
+        ("LSM", "DIRECT_SINGLE"),
+    ],
+    "LSM_3D": [
+        ("LSM_3D", "LATENCY_FULL"),
+        ("LSM_3D", "RATE_FULL"),
+        ("LSM_3D", "DIRECT_FULL"),
+        ("LSM_3D", "RATE_FULL_BALANCED"),
+        ("LSM_3D", "DIRECT_SINGLE"),
     ]
 }
 datasets = ["HERA"]
@@ -37,7 +45,7 @@ def prepare_singlerun(
 #SBATCH --exclusive
 #SBATCH --output=super_%A_%a.out
 #SBATCH --error=super_%A_%a.err
-#SBATCH --array=0-9
+#SBATCH --array=0-0
 #SBATCH --partition=gpu
 #SBATCH --account=pawsey0411-gpu
 
