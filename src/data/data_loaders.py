@@ -70,7 +70,7 @@ class HeraDataLoader(RawDataLoader):
         self.limit_datasets()
 
     def load_data(self):
-        file_path = os.path.join(self.data_dir, "HERA_21-11-2024_all.pkl")
+        file_path = os.path.join(self.data_dir, "HERA-21-11-2024_all.pkl")
         data, _, masks = np.load(file_path, allow_pickle=True)
         data = np.expand_dims(data[:, :, :, 0], -1)
         masks = np.expand_dims(masks[:, :, :, 0], -1)
@@ -89,7 +89,7 @@ class HeraDataLoader(RawDataLoader):
 
 class HeraDeltaNormLoader(RawDataLoader):
     def load_data(self):
-        file_path = os.path.join(self.data_dir, "HERA_21-11-2024_all_delta_norm.pkl")
+        file_path = os.path.join(self.data_dir, "HERA-21-11-2024_all_delta_norm.pkl")
         data, masks = np.load(
             file_path, allow_pickle=True
         )
