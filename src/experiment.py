@@ -28,7 +28,7 @@ from data.spike_converters import (
 )
 from data.spike_converters.LatencyFullConverter import LatencyFullSpikeConverter
 from data.spike_converters.delta_exposure_converter import DeltaExposureSpikeConverter
-from data.spike_converters.direct_converter import DirectSpikeConverter
+from data.spike_converters.direct_converter import DirectSpikeConverter, DirectSingleStepConverter
 from data.spike_converters.rate_full_balanced_converter import RateFullBalancedSpikeConverter
 from data.spike_converters.rate_full_converter import RateFullSpikeConverter
 from data.utils import reconstruct_patches
@@ -174,6 +174,10 @@ def encoder_from_config(config: dict) -> SpikeConverter:
         )
     elif config.get("method") == "DIRECT":
         encoder = DirectSpikeConverter(
+            exposure=config.get("exposure"),
+        )
+    elif config.get("method") == "DIRECT_SINGLE":
+        encoder = DirectSingleStepConverter(
             exposure=config.get("exposure"),
         )
     elif config.get("method") == "ANN":
