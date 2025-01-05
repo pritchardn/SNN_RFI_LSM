@@ -4,7 +4,7 @@ import lightning.pytorch as pl
 import rockpool.nn.combinators
 import torch
 from decimal import Decimal, ROUND_HALF_UP
-from rockpool.nn.modules import LinearTorch, aLIFTorch
+from rockpool.nn.modules import LinearTorch, aLIFTorch, LIFTorch
 from rockpool.weights.reservoirweights import rndm_ei_net
 import numpy as np
 from torch.optim.lr_scheduler import ReduceLROnPlateau
@@ -26,11 +26,9 @@ def initialize_taus(num_exc, num_inh, exposure):
 def initialize_reservoir(num_exc, num_inh, exposure):
     reservoir_weights = rndm_ei_net(num_exc, num_inh)
     taus = initialize_taus(num_exc, num_inh, exposure)
-    reservoir = aLIFTorch(num_exc + num_inh, learning_window=0.2, dt=0.001, tau_mem=taus)
+    reservoir = LIFTorch(num_exc + num_inh, learning_window=0.2, dt=0.001, tau_mem=taus)
     reservoir.w_rec = torch.tensor(reservoir_weights).float()
-    reservoir.w_ahp.requires_grad = False
     reservoir.bias.requires_grad = False
-    reservoir.tau_ahp.requires_grad = False
     reservoir.tau_mem.requires_grad = False
     reservoir.tau_syn.requires_grad = False
     reservoir.threshold.requires_grad = False
@@ -127,8 +125,8 @@ class LSM(pl.LightningModule):
         self.reservoir = initialize_reservoir(int(Decimal(num_hidden * 0.8).to_integral(rounding=ROUND_HALF_UP)),
                                               int(Decimal(num_hidden * 0.2).to_integral(rounding=ROUND_HALF_UP)),
                                               exposure)
-        self.reservoir.w_ahp.requires_grad = False
-        self.model = rockpool.nn.combinators.Sequential(self.input_layer, self.reservoir, self.output_layer)
+        self.decoder = LIFTorch((num_outputs, num_outputs))
+        self.model = rockpool.nn.combinators.Sequential(self.input_layer, self.reservoir, self.output_layer, self.decoder)
 
     def forward(self, x):
         x, mem, recording = self.model(x)
@@ -213,7 +211,7 @@ class LSM(pl.LightningModule):
 def generate_sparse_input_weights(num_inputs, num_hidden, p_in: float = 0.1):
     weights = torch.zeros(num_inputs, num_hidden)
     mask = torch.rand(num_inputs, num_hidden) < p_in
-    weights[mask] = (torch.rand(mask.sum()) * 0.2) + 0.2  # [0.2, 0.4]
+    weights[mask] = (torch.rand(mask.sum()) * 0.8) + 0.2  # [0.2, 1.0]
     return weights
 
 
