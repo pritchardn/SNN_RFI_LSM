@@ -59,10 +59,13 @@ class RateFullRelativeSpikeConverter(SpikeConverter):
 
         # Calculate the mean across the 'exp' dimension
         mean_inference = reshaped.mean(axis=1)
+        # Select the higher mean value for each pair of channels
+        first_half = mean_inference[:, :, :C // 2]
+        second_half = mean_inference[:, :, C // 2:]
+        output = np.where(first_half >= second_half, first_half, 0)
 
         # Reshape to the desired output shape (N, 1, F, T)
-        output = mean_inference.transpose(0, 2, 1)[:, np.newaxis, :, :]
-        output = np.maximum(output[:, :, :C//2], output[:, :, C//2:])
+        output = output.transpose(0, 2, 1)[:, np.newaxis, :, :]
         return (output > 0.2).astype(np.float32)
 
     def decode_inference_training(self, inference: torch.Tensor):
@@ -73,7 +76,9 @@ class RateFullRelativeSpikeConverter(SpikeConverter):
 
         # Calculate the mean across the 'exp' dimension
         mean_inference = reshaped.mean(axis=1)
-        output = torch.maximum(mean_inference[:, :, :C//2], mean_inference[:, :, C//2:])
+        first_half = mean_inference[:, :, :C // 2]
+        second_half = mean_inference[:, :, C // 2:]
+        output = torch.where(first_half >= second_half, first_half, torch.zeros_like(first_half))
         return torch.sigmoid(output - 0.2)
 
     def decode_y(self, y_data: np.ndarray) -> np.ndarray:

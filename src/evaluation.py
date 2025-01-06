@@ -88,17 +88,14 @@ def final_evaluation(
     # Run through the whole validation set
     full_spike_hat = []
     for x, y in tqdm(data_module.test_dataloader()):
-        spike_hat, mem_hat = model(x)
+        spike_hat, _, _ = model(x)
         full_spike_hat.append(spike_hat)
-    if "ROCKPOOL" in model_type:
-        full_spike_hat = torch.cat(full_spike_hat, dim=0)
-    else:
-        full_spike_hat = torch.cat(full_spike_hat, dim=1)
-        # save full_spike_hat into .npy file
-        np.save(
-            os.path.join(outdir, "full_spike_hat.npy"),
-            full_spike_hat.detach().cpu().numpy(),
-        )
+    full_spike_hat = torch.cat(full_spike_hat, dim=0)
+    # save full_spike_hat into .npy file
+    np.save(
+        os.path.join(outdir, "full_spike_hat.npy"),
+        full_spike_hat.detach().cpu().numpy(),
+    )
     # Decode outputs into masks
     inference = full_spike_hat.detach().cpu().numpy()
     output = converter.decode_inference(inference)
