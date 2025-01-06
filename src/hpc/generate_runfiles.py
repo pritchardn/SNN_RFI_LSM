@@ -18,7 +18,11 @@ models = {
         ("LSM_3D", "DIRECT_FULL"),
         ("LSM_3D", "RATE_FULL_BALANCED"),
         ("LSM_3D", "DIRECT_SINGLE"),
-    ]
+    ],
+    "LSM_REL":
+    [
+        ("LSM_REL", "RATE_FULL_RELATIVE"),
+    ],
 }
 datasets = ["HERA"]
 forwardstep_exposures = ["direct", "first", "latency"]

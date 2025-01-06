@@ -25,6 +25,7 @@ from data.spike_converters import (
     DeltaSpikeConverter,
     ForwardStepConverter,
     NonConverter,
+    RateFullRelativeSpikeConverter
 )
 from data.spike_converters.LatencyFullConverter import LatencyFullSpikeConverter
 from data.spike_converters.delta_exposure_converter import DeltaExposureSpikeConverter
@@ -85,7 +86,7 @@ def model_from_config(config: dict, exposure: int) -> pl.LightningModule:
     num_hidden = config.get("num_hidden")
     num_outputs = config.get("num_outputs")
     p_in = config.get("probability_in")
-    if model_type == "LSM":
+    if model_type == "LSM" or model_type == "LSM_REL":
         model = LSM(
             num_inputs=num_inputs,
             num_hidden=num_hidden,
@@ -132,9 +133,9 @@ def trainer_from_config(config: dict, root_dir: str, callbacks=None) -> pl.Train
             benchmark=True,
             default_root_dir=root_dir,
             num_nodes=config.get("num_nodes", 1),
-            accelerator="cpu",
+            accelerator="mps",
             callbacks=callbacks,
-            log_every_n_steps=25,
+            log_every_n_steps=8,
         )
     return trainer
 
@@ -162,6 +163,9 @@ def encoder_from_config(config: dict) -> SpikeConverter:
     elif config.get("method") == "RATE_FULL_BALANCED":
         exposure = config.get("exposure")
         encoder = RateFullBalancedSpikeConverter(exposure=exposure)
+    elif config.get("method") == "RATE_FULL_RELATIVE":
+        exposure = config.get("exposure")
+        encoder = RateFullRelativeSpikeConverter(exposure=exposure)
     elif config.get("method") == "DELTA":
         threshold = config.get("threshold")
         off_spikes = config.get("off_spikes")

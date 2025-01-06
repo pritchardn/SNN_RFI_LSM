@@ -4,7 +4,7 @@ import lightning.pytorch as pl
 import rockpool.nn.combinators
 import torch
 from decimal import Decimal, ROUND_HALF_UP
-from rockpool.nn.modules import LinearTorch, aLIFTorch
+from rockpool.nn.modules import LinearTorch, LIFTorch
 from rockpool.weights.reservoirweights import rndm_ei_net
 import numpy as np
 from torch.optim.lr_scheduler import ReduceLROnPlateau
@@ -26,11 +26,9 @@ def initialize_taus(num_exc, num_inh, exposure):
 def initialize_reservoir(num_exc, num_inh, exposure):
     reservoir_weights = rndm_ei_net(num_exc, num_inh)
     taus = initialize_taus(num_exc, num_inh, exposure)
-    reservoir = aLIFTorch(num_exc + num_inh, learning_window=0.2, dt=0.001, tau_mem=taus)
+    reservoir = LIFTorch(num_exc + num_inh, learning_window=0.2, dt=0.001, tau_mem=taus)
     reservoir.w_rec = torch.tensor(reservoir_weights).float()
-    reservoir.w_ahp.requires_grad = False
     reservoir.bias.requires_grad = False
-    reservoir.tau_ahp.requires_grad = False
     reservoir.tau_mem.requires_grad = False
     reservoir.tau_syn.requires_grad = False
     reservoir.threshold.requires_grad = False
@@ -98,11 +96,9 @@ def generate_reservoir_3d_weights(dim, exc_inh_ratio):
 def initialize_reservoir_3d(dim, exc_inh_ratio=0.8):
     num_neurons = dim ** 3
     weights = generate_reservoir_3d_weights(dim, exc_inh_ratio)
-    reservoir = aLIFTorch(num_neurons, learning_window=0.2, dt=0.001)
+    reservoir = LIFTorch(num_neurons, learning_window=0.2, dt=0.001)
     reservoir.w_rec = torch.tensor(weights).float()
-    reservoir.w_ahp.requires_grad = False
     reservoir.bias.requires_grad = False
-    reservoir.tau_ahp.requires_grad = False
     reservoir.tau_mem.requires_grad = False
     reservoir.tau_syn.requires_grad = False
     reservoir.threshold.requires_grad = False
@@ -111,9 +107,10 @@ def initialize_reservoir_3d(dim, exc_inh_ratio=0.8):
 
 class LSM(pl.LightningModule):
 
-    def __init__(self, num_inputs: int, num_hidden: int, num_outputs: int, exposure: int, p_in: float):
+    def __init__(self, num_inputs: int, num_hidden: int, num_outputs: int, exposure: int, p_in: float, plot=False):
         super().__init__()
         self.converter = None
+        self.plot = plot
         self.learning_rate = 1e-4
         self.num_inputs = num_inputs
         self.num_hidden = num_hidden
@@ -127,7 +124,6 @@ class LSM(pl.LightningModule):
         self.reservoir = initialize_reservoir(int(Decimal(num_hidden * 0.8).to_integral(rounding=ROUND_HALF_UP)),
                                               int(Decimal(num_hidden * 0.2).to_integral(rounding=ROUND_HALF_UP)),
                                               exposure)
-        self.reservoir.w_ahp.requires_grad = False
         self.model = rockpool.nn.combinators.Sequential(self.input_layer, self.reservoir, self.output_layer)
 
     def forward(self, x):
@@ -150,7 +146,7 @@ class LSM(pl.LightningModule):
         y_true = self.converter.decode_y(y)
         loss = self.loss(pred, y_true)
         self.log("val_loss", loss, sync_dist=True)
-        if batch_idx == 0 and self.trainer.local_rank == 0:
+        if batch_idx == 0 and self.trainer.local_rank == 0 and self.plot:
             # Reshape spike_hat to [N, T, C, F T]
             spike_hat_plot = torch.reshape(
                 spike_hat.detach().cpu(),
@@ -218,9 +214,10 @@ def generate_sparse_input_weights(num_inputs, num_hidden, p_in: float = 0.1):
 
 
 class LSM3D(pl.LightningModule):
-    def __init__(self, num_inputs: int, num_hidden: int, num_outputs: int, exposure: int, p_in: float):
+    def __init__(self, num_inputs: int, num_hidden: int, num_outputs: int, exposure: int, p_in: float, plot=False):
         super().__init__()
         self.converter = None
+        self.plot = plot
         self.learning_rate = 1e-4
         self.num_inputs = num_inputs
         self.num_hidden = num_hidden ** 3
@@ -234,7 +231,6 @@ class LSM3D(pl.LightningModule):
         self.input_layer.requires_grad = False
         self.output_layer = LinearTorch((self.num_hidden, num_outputs))
         self.reservoir = initialize_reservoir_3d(num_hidden)
-        self.reservoir.w_ahp.requires_grad = False
         self.model = rockpool.nn.combinators.Sequential(self.input_layer, self.reservoir, self.output_layer)
 
     def forward(self, x):
@@ -257,7 +253,7 @@ class LSM3D(pl.LightningModule):
         y_true = self.converter.decode_y(y)
         loss = self.loss(pred, y_true)
         self.log("val_loss", loss, sync_dist=True)
-        if batch_idx == 0 and self.trainer.local_rank == 0:
+        if batch_idx == 0 and self.trainer.local_rank == 0 and self.plot:
             # Reshape spike_hat to [N, T, C, F T]
             spike_hat_plot = torch.reshape(
                 spike_hat.detach().cpu(),
