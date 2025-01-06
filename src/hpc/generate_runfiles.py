@@ -60,6 +60,7 @@ export ENCODER_METHOD="{encoding}"
 export FORWARD_EXPOSURE="{forward_step_exposure}"
 export NNODES="{num_nodes}"
 export DELTA_NORMALIZATION="{delta_norm}"
+export PLOT="True"
 
 module load python/3.10.10
 
