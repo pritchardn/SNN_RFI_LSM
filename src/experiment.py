@@ -140,13 +140,16 @@ def trainer_from_config(config: dict, root_dir: str, callbacks=None) -> pl.Train
             log_every_n_steps=25,
         )
     else:
-        # TODO: Make MPS conditional
+        if torch.mps.is_available():
+            accelerator = "mps"
+        else:
+            accelerator = "cpu"
         trainer = pl.trainer.Trainer(
             max_epochs=epochs,
             benchmark=True,
             default_root_dir=root_dir,
             num_nodes=config.get("num_nodes", 1),
-            accelerator="cpu",
+            accelerator=accelerator,
             callbacks=callbacks,
             log_every_n_steps=8,
         )
