@@ -12,6 +12,20 @@ models = {
         ("LSM", "RATE_FULL_BALANCED"),
         ("LSM", "DIRECT_SINGLE"),
     ],
+    "LSM_TRANSFORMER": [
+        ("LSM_TRANSFORMER", "LATENCY_FULL"),
+        ("LSM_TRANSFORMER", "RATE_FULL"),
+        ("LSM_TRANSFORMER", "DIRECT_FULL"),
+        ("LSM_TRANSFORMER", "RATE_FULL_BALANCED"),
+        ("LSM_TRANSFORMER", "DIRECT_SINGLE"),
+    ],
+    "LSM_RELU": [
+        ("LSM_RELU", "LATENCY_FULL"),
+        ("LSM_RELU", "RATE_FULL"),
+        ("LSM_RELU", "DIRECT_FULL"),
+        ("LSM_RELU", "RATE_FULL_BALANCED"),
+        ("LSM_RELU", "DIRECT_SINGLE"),
+    ],
     "LSM_3D": [
         ("LSM_3D", "LATENCY_FULL"),
         ("LSM_3D", "RATE_FULL"),
@@ -24,6 +38,16 @@ models = {
         ("LSM_REL", "RATE_FULL_RELATIVE"),
         ("LSM_REL", "LATENCY_FULL_RELATIVE"),
     ],
+    "LSM_TRANSFORMER_REL":
+        [
+            ("LSM_TRANSFORMER_REL", "RATE_FULL_RELATIVE"),
+            ("LSM_TRANSFORMER_REL", "LATENCY_FULL_RELATIVE"),
+        ],
+    "LSM_RELU_REL":
+        [
+            ("LSM_RELU_REL", "RATE_FULL_RELATIVE"),
+            ("LSM_RELU_REL", "LATENCY_FULL_RELATIVE"),
+        ],
     "LSM_MEM":
     [
         ("LSM_MEM", "DIRECT_MEMBRANE"),
