@@ -149,7 +149,7 @@ class LSM(pl.LightningModule):
         if self.readout == "transformer":
             x = self.decoder(x, x)
         else:
-            x = self.decoder(x)
+            x, mem, recording = self.decoder(x)
         return x, mem, recording
 
     def training_step(self, batch, batch_idx):
