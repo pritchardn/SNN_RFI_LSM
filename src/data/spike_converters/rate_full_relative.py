@@ -66,7 +66,7 @@ class RateFullRelativeSpikeConverter(SpikeConverter):
 
         # Reshape to the desired output shape (N, 1, F, T)
         output = output.transpose(0, 2, 1)[:, np.newaxis, :, :]
-        return (output > 0.2).astype(np.float32)
+        return (output > 0.0).astype(np.float32)
 
     def decode_inference_training(self, inference: torch.Tensor):
         # Reshape to separate the 'exp' dimension
@@ -79,7 +79,7 @@ class RateFullRelativeSpikeConverter(SpikeConverter):
         first_half = mean_inference[:, :, :C // 2]
         second_half = mean_inference[:, :, C // 2:]
         output = torch.where(first_half >= second_half, first_half, torch.zeros_like(first_half))
-        return torch.sigmoid(output - 0.2)
+        return output
 
     def decode_y(self, y_data: np.ndarray) -> np.ndarray:
         # Undo the encode_y operation
