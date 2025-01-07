@@ -31,7 +31,8 @@ from data.spike_converters import (
     NonConverter,
     RateFullRelativeSpikeConverter,
     DirectSpikeConverter,
-    DirectSingleStepConverter
+    DirectSingleStepConverter,
+    LatencyFullRelativeSpikeConverter
 )
 from data.utils import reconstruct_patches
 from models.lsm import LSM, LSM3D
@@ -153,6 +154,13 @@ def encoder_from_config(config: dict) -> SpikeConverter:
         tau = config.get("tau")
         normalize = config.get("normalize")
         encoder = LatencyFullSpikeConverter(
+            exposure=exposure, tau=tau, normalize=normalize
+        )
+    elif config.get("method") == "LATENCY_FULL_RELATIVE":
+        exposure = config.get("exposure")
+        tau = config.get("tau")
+        normalize = config.get("normalize")
+        encoder = LatencyFullRelativeSpikeConverter(
             exposure=exposure, tau=tau, normalize=normalize
         )
     elif config.get("method") == "RATE":

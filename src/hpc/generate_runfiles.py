@@ -22,6 +22,7 @@ models = {
     "LSM_REL":
     [
         ("LSM_REL", "RATE_FULL_RELATIVE"),
+        ("LSM_REL", "LATENCY_FULL_RELATIVE"),
     ],
 }
 datasets = ["HERA"]
