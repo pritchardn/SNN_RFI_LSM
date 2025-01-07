@@ -15,18 +15,20 @@ from interfaces.data.spiking_data_module import SpikeConverter
 from plotting import plot_input_raster, plot_example_mask, plot_target_raster, \
     plot_network_internals, plot_example_inference
 
+BASE_TAU = 0.002
 
 def initialize_taus(num_exc, num_inh, exposure):
-    taus = torch.zeros(num_exc + num_inh)
-    taus[:num_exc] = exposure / 3
-    taus[num_exc:] = exposure
+    taus_exc = 0.001 + torch.rand(num_exc) * (0.01 - 0.001)
+    taus_inh = 0.001 + torch.rand(num_inh) * (0.01 - 0.001)
+    taus = torch.cat((taus_exc, taus_inh))
     return taus
 
 
 def initialize_reservoir(num_exc, num_inh, exposure):
     reservoir_weights = rndm_ei_net(num_exc, num_inh)
     taus = initialize_taus(num_exc, num_inh, exposure)
-    reservoir = LIFTorch(num_exc + num_inh, learning_window=0.2, dt=0.001, tau_mem=taus)
+    taus_syns = initialize_taus(num_exc, num_inh, exposure)
+    reservoir = LIFTorch(num_exc + num_inh, learning_window=0.2, dt=0.001, tau_mem=taus, tau_syn=taus_syns)
     reservoir.w_rec = torch.tensor(reservoir_weights).float()
     reservoir.bias.requires_grad = False
     reservoir.tau_mem.requires_grad = False
@@ -124,10 +126,12 @@ class LSM(pl.LightningModule):
         self.reservoir = initialize_reservoir(int(Decimal(num_hidden * 0.8).to_integral(rounding=ROUND_HALF_UP)),
                                               int(Decimal(num_hidden * 0.2).to_integral(rounding=ROUND_HALF_UP)),
                                               exposure)
+        self.decoder = torch.nn.TransformerDecoderLayer(d_model=num_outputs, nhead=4)
         self.model = rockpool.nn.combinators.Sequential(self.input_layer, self.reservoir, self.output_layer)
 
     def forward(self, x):
         x, mem, recording = self.model(x)
+        x = self.decoder(x, x)
         return x, mem, recording
 
     def training_step(self, batch, batch_idx):
