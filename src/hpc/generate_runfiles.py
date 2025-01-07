@@ -114,7 +114,7 @@ def prepare_optuna(
 #SBATCH --exclusive
 #SBATCH --output=super_%A_%a.out
 #SBATCH --error=super_%A_%a.err
-#SBATCH --array=0-49%4
+#SBATCH --array=0-25%4
 #SBATCH --partition=gpu
 #SBATCH --account=pawsey0411-gpu
 
