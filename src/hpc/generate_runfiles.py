@@ -24,6 +24,10 @@ models = {
         ("LSM_REL", "RATE_FULL_RELATIVE"),
         ("LSM_REL", "LATENCY_FULL_RELATIVE"),
     ],
+    "LSM_MEM":
+    [
+        ("LSM_MEM", "DIRECT_MEMBRANE"),
+    ]
 }
 datasets = ["HERA"]
 forwardstep_exposures = ["direct", "first", "latency"]

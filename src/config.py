@@ -95,6 +95,36 @@ DEFAULT_3D_HERA_DIRECT_SINGLE = {
     },
 }
 
+DEFAULT_HERA_DIRECT_MEM = {
+    "data_source": {
+        "data_path": "./data",
+        "limit": 1.0,
+        "patch_size": 32,
+        "stride": 32,
+        "dataset": "HERA",
+    },
+    "dataset": {
+        "batch_size": 1,
+    },
+    "model": {
+        "type": "LSM_MEM",
+        "num_inputs": 32,
+        "num_hidden": 4096,
+        "num_outputs": 32,
+        "probability_in": 0.25,
+    },
+    "trainer": {
+        "epochs": 100,
+        "num_nodes": int(os.getenv("NNODES", 1)),
+    },
+    "encoder": {
+        "method": "DIRECT_MEMBRANE",
+        "exposure": 8,
+        "tau": 1.0,
+        "normalize": True,
+    },
+}
+
 
 def get_default_params(
         dataset: str,
@@ -108,6 +138,8 @@ def get_default_params(
             params = copy.deepcopy(DEFAULT_HERA_RATE_REL)
         elif model_type == "LSM_3D":
             params = copy.deepcopy(DEFAULT_3D_HERA_DIRECT_SINGLE)
+        elif model_type == "LSM_MEM":
+            params = copy.deepcopy(DEFAULT_HERA_DIRECT_MEM)
         else:
             raise ValueError(f"Unknown model type {model_type}")
     elif dataset == "LOFAR":

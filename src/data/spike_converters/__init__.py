@@ -11,3 +11,4 @@ from .rate_full_balanced_converter import RateFullBalancedSpikeConverter
 from .direct_converter import DirectSpikeConverter
 from .direct_converter import DirectSingleStepConverter
 from .latency_full_relative_converter import LatencyFullRelativeSpikeConverter
+from .direct_membrane_converter import DirectMembraneConverter

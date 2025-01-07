@@ -32,13 +32,15 @@ from data.spike_converters import (
     RateFullRelativeSpikeConverter,
     DirectSpikeConverter,
     DirectSingleStepConverter,
-    LatencyFullRelativeSpikeConverter
+    LatencyFullRelativeSpikeConverter,
+    DirectMembraneConverter,
 )
 from data.utils import reconstruct_patches
 from models.lsm import LSM, LSM3D
 from evaluation import final_evaluation
 from interfaces.data.raw_data_loader import RawDataLoader
 from interfaces.data.spiking_data_module import SpikeConverter
+from src.models.lsm_mem import LSMMembrane
 
 
 def data_source_from_config(config: dict) -> RawDataLoader:
@@ -97,6 +99,15 @@ def model_from_config(config: dict, exposure: int) -> pl.LightningModule:
             p_in=p_in
         )
         return model
+    if model_type == "LSM_MEM":
+        model = LSMMembrane(
+            num_inputs=num_inputs,
+            num_hidden=num_hidden,
+            num_outputs=num_outputs,
+            exposure=exposure,
+            p_in=p_in
+        )
+        return model
     elif model_type == "LSM_3D":
         model = LSM3D(
             num_inputs=num_inputs,
@@ -130,12 +141,13 @@ def trainer_from_config(config: dict, root_dir: str, callbacks=None) -> pl.Train
             log_every_n_steps=25,
         )
     else:
+        # TODO: Make MPS conditional
         trainer = pl.trainer.Trainer(
             max_epochs=epochs,
             benchmark=True,
             default_root_dir=root_dir,
             num_nodes=config.get("num_nodes", 1),
-            accelerator="mps",
+            accelerator="cpu",
             callbacks=callbacks,
             log_every_n_steps=8,
         )
@@ -202,6 +214,10 @@ def encoder_from_config(config: dict) -> SpikeConverter:
         )
     elif config.get("method") == "DIRECT_SINGLE":
         encoder = DirectSingleStepConverter(
+            exposure=config.get("exposure"),
+        )
+    elif config.get("method") == "DIRECT_MEMBRANE":
+        encoder = DirectMembraneConverter(
             exposure=config.get("exposure"),
         )
     elif config.get("method") == "ANN":
