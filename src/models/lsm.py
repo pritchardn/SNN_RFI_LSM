@@ -126,7 +126,7 @@ class LSM(pl.LightningModule):
         self.reservoir = initialize_reservoir(int(Decimal(num_hidden * 0.8).to_integral(rounding=ROUND_HALF_UP)),
                                               int(Decimal(num_hidden * 0.2).to_integral(rounding=ROUND_HALF_UP)),
                                               exposure)
-        self.decoder = torch.nn.TransformerDecoderLayer(d_model=num_outputs, nhead=4)
+        self.decoder = torch.nn.TransformerDecoderLayer(d_model=num_outputs, nhead=4, norm_first=True)
         self.model = rockpool.nn.combinators.Sequential(self.input_layer, self.reservoir, self.output_layer)
 
     def forward(self, x):
