@@ -27,7 +27,7 @@ from data.spike_converters import (
     NonConverter,
     RateFullRelativeSpikeConverter
 )
-from data.spike_converters.LatencyFullConverter import LatencyFullSpikeConverter
+from data.spike_converters.latency_full_converter import LatencyFullSpikeConverter
 from data.spike_converters.delta_exposure_converter import DeltaExposureSpikeConverter
 from data.spike_converters.direct_converter import DirectSpikeConverter, DirectSingleStepConverter
 from data.spike_converters.rate_full_balanced_converter import RateFullBalancedSpikeConverter
