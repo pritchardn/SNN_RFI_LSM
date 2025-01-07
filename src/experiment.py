@@ -21,17 +21,18 @@ from data.data_module import ConfiguredDataModule
 from data.data_module_builder import DataModuleBuilder
 from data.spike_converters import (
     LatencySpikeConverter,
+    LatencyFullSpikeConverter,
     RateSpikeConverter,
+    RateFullBalancedSpikeConverter,
+    RateFullSpikeConverter,
     DeltaSpikeConverter,
+    DeltaExposureSpikeConverter,
     ForwardStepConverter,
     NonConverter,
-    RateFullRelativeSpikeConverter
+    RateFullRelativeSpikeConverter,
+    DirectSpikeConverter,
+    DirectSingleStepConverter
 )
-from data.spike_converters.latency_full_converter import LatencyFullSpikeConverter
-from data.spike_converters.delta_exposure_converter import DeltaExposureSpikeConverter
-from data.spike_converters.direct_converter import DirectSpikeConverter, DirectSingleStepConverter
-from data.spike_converters.rate_full_balanced_converter import RateFullBalancedSpikeConverter
-from data.spike_converters.rate_full_converter import RateFullSpikeConverter
 from data.utils import reconstruct_patches
 from models.lsm import LSM, LSM3D
 from evaluation import final_evaluation
