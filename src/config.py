@@ -51,7 +51,7 @@ DEFAULT_HERA_RATE_REL = {
         "num_inputs": 32,
         "num_hidden": 4096,
         "num_outputs": 64,
-        "probability_in": 0.25,
+        "probability_in": 0.3,
     },
     "trainer": {
         "epochs": 100,
