@@ -321,7 +321,7 @@ class Experiment:
         # Write output
         with open(os.path.join(self.trainer.log_dir, "metrics.json"), "w") as ofile:
             json.dump(output, ofile, indent=4)
-        if plot:
+        if plot and self.trainer.local_rank == 0:
             try:
                 mask_orig = reconstruct_patches(
                     self.data_source.fetch_test_y(),
