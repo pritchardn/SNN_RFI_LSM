@@ -17,6 +17,13 @@ from plotting import plot_input_raster, plot_example_mask, plot_target_raster, \
 
 BASE_TAU = 0.002
 
+def generate_sparse_input_weights(num_inputs, num_hidden, p_in: float = 0.1):
+    weights = torch.zeros(num_inputs, num_hidden)
+    mask = torch.rand(num_inputs, num_hidden) < p_in
+    weights[mask] = (torch.rand(mask.sum()) * 0.2) + 0.2  # [0.2, 0.4]
+    return weights
+
+
 def initialize_taus(num_exc, num_inh, exposure):
     taus_exc = 0.001 + torch.rand(num_exc) * (0.01 - 0.001)
     taus_inh = 0.001 + torch.rand(num_inh) * (0.01 - 0.001)
@@ -208,13 +215,6 @@ class LSM(pl.LightningModule):
 
     def set_converter(self, converter: SpikeConverter):
         self.converter = converter
-
-
-def generate_sparse_input_weights(num_inputs, num_hidden, p_in: float = 0.1):
-    weights = torch.zeros(num_inputs, num_hidden)
-    mask = torch.rand(num_inputs, num_hidden) < p_in
-    weights[mask] = (torch.rand(mask.sum()) * 0.2) + 0.2  # [0.2, 0.4]
-    return weights
 
 
 class LSM3D(pl.LightningModule):
