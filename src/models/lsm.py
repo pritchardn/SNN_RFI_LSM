@@ -235,10 +235,12 @@ class LSM3D(pl.LightningModule):
         self.input_layer.requires_grad = False
         self.output_layer = LinearTorch((self.num_hidden, num_outputs))
         self.reservoir = initialize_reservoir_3d(num_hidden)
+        self.decoder = torch.nn.TransformerDecoderLayer(d_model=num_outputs, nhead=4, norm_first=True)
         self.model = rockpool.nn.combinators.Sequential(self.input_layer, self.reservoir, self.output_layer)
 
     def forward(self, x):
         x, mem, recording = self.model(x)
+        x = self.decoder(x, x)
         return x, mem, recording
 
     def training_step(self, batch, batch_idx):
