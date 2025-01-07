@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from src.interfaces.data.spiking_data_module import SpikeConverter
+from interfaces.data.spiking_data_module import SpikeConverter
 
 
 class DirectMembraneConverter(SpikeConverter):

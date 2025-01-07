@@ -37,11 +37,10 @@ from data.spike_converters import (
 )
 from data.utils import reconstruct_patches
 from models.lsm import LSM, LSM3D
+from models.lsm_mem import LSMMembrane
 from evaluation import final_evaluation
 from interfaces.data.raw_data_loader import RawDataLoader
 from interfaces.data.spiking_data_module import SpikeConverter
-from src.models.lsm_mem import LSMMembrane
-
 
 def data_source_from_config(config: dict) -> RawDataLoader:
     data_path = config.get("data_path")

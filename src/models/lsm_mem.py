@@ -1,15 +1,13 @@
 import lightning.pytorch as pl
 import rockpool.nn.combinators
 import torch
-import json
 from decimal import Decimal, ROUND_HALF_UP
 
-from matplotlib.font_manager import json_dump
 from rockpool.nn.modules import LinearTorch, LIFTorch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from src.evaluation import calculate_metrics
-from src.interfaces.data.spiking_data_module import SpikeConverter
-from src.models.lsm import generate_sparse_input_weights, initialize_reservoir
+from evaluation import calculate_metrics
+from interfaces.data.spiking_data_module import SpikeConverter
+from models.lsm import generate_sparse_input_weights, initialize_reservoir
 
 
 class LSMMembrane(pl.LightningModule):
