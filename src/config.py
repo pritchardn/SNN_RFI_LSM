@@ -136,6 +136,14 @@ def get_default_params(
             params = copy.deepcopy(DEFAULT_HERA_RATE)
         elif model_type == "LSM_REL":
             params = copy.deepcopy(DEFAULT_HERA_RATE_REL)
+        elif model_type == "LSM_TRANSFORMER":
+            params = copy.deepcopy(DEFAULT_HERA_RATE)
+        elif model_type == "LSM_TRANSFORMER_REL":
+            params = copy.deepcopy(DEFAULT_HERA_RATE_REL)
+        elif model_type == "LSM_RELU":
+            params = copy.deepcopy(DEFAULT_HERA_RATE)
+        elif model_type == "LSM_RELU_REL":
+            params = copy.deepcopy(DEFAULT_HERA_RATE_REL)
         elif model_type == "LSM_3D":
             params = copy.deepcopy(DEFAULT_3D_HERA_DIRECT_SINGLE)
         elif model_type == "LSM_MEM":

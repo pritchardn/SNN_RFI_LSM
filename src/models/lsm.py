@@ -116,7 +116,7 @@ def initialize_reservoir_3d(dim, exc_inh_ratio=0.8):
 
 class LSM(pl.LightningModule):
 
-    def __init__(self, num_inputs: int, num_hidden: int, num_outputs: int, exposure: int, p_in: float, plot=False):
+    def __init__(self, num_inputs: int, num_hidden: int, num_outputs: int, exposure: int, p_in: float, plot=False, readout="linear"):
         super().__init__()
         self.converter = None
         self.plot = plot
@@ -133,12 +133,23 @@ class LSM(pl.LightningModule):
         self.reservoir = initialize_reservoir(int(Decimal(num_hidden * 0.8).to_integral(rounding=ROUND_HALF_UP)),
                                               int(Decimal(num_hidden * 0.2).to_integral(rounding=ROUND_HALF_UP)),
                                               exposure)
-        self.decoder = torch.nn.TransformerDecoderLayer(d_model=num_outputs, nhead=4, norm_first=True)
+        self.readout = readout
+        if readout == "linear":
+            self.decoder = LinearTorch((num_outputs, num_outputs))
+        elif readout == "relu":
+            self.decoder = torch.nn.ReLU()
+        elif readout == "transformer":
+            self.decoder = torch.nn.TransformerDecoderLayer(d_model=num_outputs, nhead=4, norm_first=True)
+        else:
+            raise ValueError("Invalid readout type")
         self.model = rockpool.nn.combinators.Sequential(self.input_layer, self.reservoir, self.output_layer)
 
     def forward(self, x):
         x, mem, recording = self.model(x)
-        x = self.decoder(x, x)
+        if self.readout == "transformer":
+            x = self.decoder(x, x)
+        else:
+            x = self.decoder(x)
         return x, mem, recording
 
     def training_step(self, batch, batch_idx):

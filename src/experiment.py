@@ -98,6 +98,26 @@ def model_from_config(config: dict, exposure: int) -> pl.LightningModule:
             p_in=p_in
         )
         return model
+    elif model_type == "LSM_RELU" or model_type == "LSM_RELU_REL":
+        model = LSM(
+            num_inputs=num_inputs,
+            num_hidden=num_hidden,
+            num_outputs=num_outputs,
+            exposure=exposure,
+            p_in=p_in,
+            readout="relu",
+        )
+        return model
+    elif model_type == "LSM_TRANSFORMER" or model_type == "LSM_TRANSFORMER_REL":
+        model = LSM(
+            num_inputs=num_inputs,
+            num_hidden=num_hidden,
+            num_outputs=num_outputs,
+            exposure=exposure,
+            p_in=p_in,
+            readout="transformer",
+        )
+        return model
     if model_type == "LSM_MEM":
         model = LSMMembrane(
             num_inputs=num_inputs,
