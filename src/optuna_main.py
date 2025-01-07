@@ -16,32 +16,28 @@ from experiment import Experiment
 
 def objective(trial):
     dataset = os.getenv("DATASET", "HERA")
-    model_type = os.getenv("MODEL_TYPE", "FC_RATE_ROCKPOOL")
+    model_type = os.getenv("MODEL_TYPE", "LSM")
     config = get_default_params(dataset, model_type)
 
     config["data_source"]["data_path"] = os.getenv("DATA_PATH", "./data")
     config["data_source"]["limit"] = float(os.getenv("LIMIT", 0.1))
-    config["data_source"]["patch_size"] = int(os.getenv("PATCH_SIZE", 16))
-    config["data_source"]["stride"] = int(os.getenv("STRIDE", 16))
+    config["data_source"]["patch_size"] = int(os.getenv("PATCH_SIZE", 32))
+    config["data_source"]["stride"] = int(os.getenv("STRIDE", 32))
     config["data_source"]["delta_normalization"] = (
         os.getenv("DELTA_NORMALIZATION", False) == "True"
     )
 
     config["dataset"]["batch_size"] = int(os.getenv("BATCH_SIZE", 36))
     config["model"]["num_hidden"] = trial.suggest_categorical(
-        "num_hidden", [128, 256, 512]
+        "num_hidden", [512, 1024, 2048, 4096, 8192]
     )
-    config["model"]["num_layers"] = trial.suggest_int("num_layers", 2, 6)
-    config["trainer"]["epochs"] = int(os.getenv("EPOCHS", 100))
+    config["model"]["num_layers"] = int(os.getenv("NUM_LAYERS", 2))
+    config["trainer"]["epochs"] = int(os.getenv("EPOCHS", 50))
     config["encoder"]["method"] = os.getenv("ENCODER_METHOD", "RATE_FULL")
     config["encoder"]["exposure_mode"] = os.getenv("FORWARD_EXPOSURE", "latency")
 
-    if model_type != "FC_ANN":
-        config["model"]["beta"] = trial.suggest_float("beta", 0.0, 1.0)
-        config["encoder"]["exposure"] = trial.suggest_int("exposure", 1, 64)
-    else:
-        config["model"]["beta"] = 0.0
-        config["encoder"]["exposure"] = 1
+    config["model"]["probability_in"] = trial.suggest_float("probability_in", 0.0, 1.0)
+    config["encoder"]["exposure"] = trial.suggest_categorical("exposure", [1, 2, 4, 8, 16, 32])
 
     print(json.dumps(config, indent=4))
     root_dir = os.getenv("OUTPUT_DIR", "./")
