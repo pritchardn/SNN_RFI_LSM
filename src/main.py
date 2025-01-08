@@ -12,6 +12,7 @@ def main():
     model_type = os.getenv("MODEL_TYPE", "LSM")
     dataset = os.getenv("DATASET", "HERA")
     num_layers = int(os.getenv("NUM_LAYERS", 2))
+    encoder = os.getenv("ENCODER_METHOD", "RATE_FULL")
     tau_mem = os.getenv("TAU_MEM", None)
     tau_mem = float(tau_mem) if tau_mem else None
     tau_syn = os.getenv("TAU_SYN", None)
@@ -19,7 +20,7 @@ def main():
     plot = os.getenv("PLOT", False) == "True"
     delta_normalization = os.getenv("DELTA_NORMALIZATION", False) == "True"
     config = get_default_params(
-        dataset, model_type, delta_normalization
+        dataset, model_type, delta_normalization, encoding_method=encoder
     )
     config["data_source"]["data_path"] = os.getenv(
         "DATA_PATH", config["data_source"]["data_path"]
@@ -36,9 +37,6 @@ def main():
     )
     config["encoder"]["exposure"] = int(
         os.getenv("EXPOSURE", config["encoder"].get("exposure", 1))
-    )
-    config["encoder"]["method"] = os.getenv(
-        "ENCODER", config["encoder"].get("method")
     )
     config["dataset"]["batch_size"] = int(
         os.getenv("BATCH_SIZE", config["dataset"]["batch_size"])
