@@ -34,8 +34,8 @@ class LSMMembrane(pl.LightningModule):
 
     def forward(self, x):
         membranes = []
+        self.model.reset_state()
         for i in range(0, x.shape[1], self.converter.exposure):
-            self.model.reset_state()
             segment = x[:, i:i + self.converter.exposure, ...]
             spikes, mem, recording = self.model(segment)
             membranes.append(mem["3_LIFTorch"]["isyn"].clone().requires_grad_(spikes.requires_grad))
