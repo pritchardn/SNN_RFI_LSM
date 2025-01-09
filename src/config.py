@@ -65,6 +65,36 @@ DEFAULT_HERA_LATENCY = {
     },
 }
 
+DEFAULT_HERA_DIRECT = {
+    "data_source": {
+        "data_path": "./data",
+        "limit": 1.0,
+        "patch_size": 32,
+        "stride": 32,
+        "dataset": "HERA",
+    },
+    "dataset": {
+        "batch_size": 36,
+    },
+    "model": {
+        "type": "LSM",
+        "num_inputs": 32,
+        "num_hidden": 4096,
+        "num_outputs": 32,
+        "probability_in": 0.654,
+    },
+    "trainer": {
+        "epochs": 100,
+        "num_nodes": int(os.getenv("NNODES", 1)),
+    },
+    "encoder": {
+        "method": "DIRECT",
+        "exposure": 1,
+        "tau": 1.0,
+        "normalize": True,
+    },
+}
+
 DEFAULT_HERA_RATE_REL = {
     "data_source": {
         "data_path": "./data",
@@ -90,6 +120,36 @@ DEFAULT_HERA_RATE_REL = {
     "encoder": {
         "method": "RATE_FULL_RELATIVE",
         "exposure": 16,
+        "tau": 1.0,
+        "normalize": True,
+    },
+}
+
+DEFAULT_TRANSFORMER_HERA_RATE = {
+    "data_source": {
+        "data_path": "./data",
+        "limit": 1.0,
+        "patch_size": 32,
+        "stride": 32,
+        "dataset": "HERA",
+    },
+    "dataset": {
+        "batch_size": 36,
+    },
+    "model": {
+        "type": "LSM",
+        "num_inputs": 32,
+        "num_hidden": 2048,
+        "num_outputs": 32,
+        "probability_in": 0.285,
+    },
+    "trainer": {
+        "epochs": 100,
+        "num_nodes": int(os.getenv("NNODES", 1)),
+    },
+    "encoder": {
+        "method": "RATE_FULL",
+        "exposure": 4,
         "tau": 1.0,
         "normalize": True,
     },
@@ -166,17 +226,16 @@ def get_default_params(
         if model_type == "LSM":
             if encoding_method == "LATENCY_FULL":
                 params = copy.deepcopy(DEFAULT_HERA_LATENCY)
+            elif encoding_method == "DIRECT":
+                params = copy.deepcopy(DEFAULT_HERA_DIRECT)
             else:
                 params = copy.deepcopy(DEFAULT_HERA_RATE)
         elif model_type == "LSM_REL":
             params = copy.deepcopy(DEFAULT_HERA_RATE_REL)
         elif model_type == "LSM_TRANSFORMER":
-            if encoding_method == "LATENCY_FULL":
-                params = copy.deepcopy(DEFAULT_HERA_LATENCY)
-            else:
-                params = copy.deepcopy(DEFAULT_HERA_RATE)
+            params = copy.deepcopy(DEFAULT_TRANSFORMER_HERA_RATE)
         elif model_type == "LSM_TRANSFORMER_REL":
-            params = copy.deepcopy(DEFAULT_HERA_RATE_REL)
+            params = copy.deepcopy(DEFAULT_TRANSFORMER_HERA_RATE)
         elif model_type == "LSM_RELU":
             if encoding_method == "LATENCY_FULL":
                 params = copy.deepcopy(DEFAULT_HERA_LATENCY)
