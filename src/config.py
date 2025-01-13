@@ -275,6 +275,36 @@ DEFAULT_RELU_HERA_DIRECT = {
     },
 }
 
+DEFAULT_RELU_HERA_LATENCY = {
+    "data_source": {
+        "data_path": "./data",
+        "limit": 1.0,
+        "patch_size": 32,
+        "stride": 32,
+        "dataset": "HERA",
+    },
+    "dataset": {
+        "batch_size": 36,
+    },
+    "model": {
+        "type": "LSM",
+        "num_inputs": 32,
+        "num_hidden": 8192,
+        "num_outputs": 32,
+        "probability_in": 0.377,
+    },
+    "trainer": {
+        "epochs": 100,
+        "num_nodes": int(os.getenv("NNODES", 1)),
+    },
+    "encoder": {
+        "method": "RATE_FULL",
+        "exposure": 32,
+        "tau": 1.0,
+        "normalize": True,
+    },
+}
+
 DEFAULT_3D_HERA_DIRECT_SINGLE = {
     "data_source": {
         "data_path": "./data",
@@ -363,11 +393,11 @@ def get_default_params(
             params = copy.deepcopy(DEFAULT_TRANSFORMER_HERA_RATE)
         elif model_type == "LSM_RELU":
             if encoding_method == "LATENCY_FULL":
-                params = copy.deepcopy(DEFAULT_HERA_LATENCY)
+                params = copy.deepcopy(DEFAULT_RELU_HERA_LATENCY)
             elif encoding_method == "DIRECT":
                 params = copy.deepcopy(DEFAULT_RELU_HERA_DIRECT)
             else:
-                params = copy.deepcopy(DEFAULT_HERA_RATE)
+                params = copy.deepcopy(DEFAULT_RELU_HERA_RATE)
         elif model_type == "LSM_RELU_REL":
             params = copy.deepcopy(DEFAULT_HERA_RATE_REL)
         elif model_type == "LSM_3D":
