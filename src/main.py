@@ -22,6 +22,7 @@ def main():
     config = get_default_params(
         dataset, model_type, delta_normalization, encoding_method=encoder
     )
+    config["encoder"]["method"] = encoder
     config["data_source"]["data_path"] = os.getenv(
         "DATA_PATH", config["data_source"]["data_path"]
     )

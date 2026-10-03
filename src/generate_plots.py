@@ -12,6 +12,7 @@ from tqdm import tqdm
 from config import get_default_params
 from experiment import data_source_from_config, encoder_from_config
 
+CMAP = "viridis"
 
 def load_dataset_examples(config: dict, limit: int):
     data_source = data_source_from_config(config["data_source"])
@@ -37,8 +38,8 @@ def plot_example_original(x, y, i, title: str, outdir="./"):
     gs = fig.add_gridspec(1, 2)
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[0, 1])
-    image1 = ax1.imshow(np.moveaxis(x, 0, -1))
-    image2 = ax2.imshow(np.moveaxis(y, 0, -1))
+    image1 = ax1.imshow(np.moveaxis(x, 0, -1), cmap=CMAP)
+    image2 = ax2.imshow(np.moveaxis(y, 0, -1), cmap=CMAP)
     plt.colorbar(image1, location="right", shrink=0.9)
     plt.colorbar(image2, location="right", shrink=0.9, ticks=[0, 1])
     fig.text(0.5, 0.1, "Time [s]", ha="center", va="center", fontsize=16)
@@ -63,33 +64,12 @@ def plot_example_raster(
     plt.rc("ytick", labelsize=8 * mode)
     plt.figure(figsize=(10, 5))
     example = spike_x
-    example = example.squeeze(1)  # Remove channel dimension
-    out = np.zeros((frequency_width, stride * exposure))
-    for t in range(example.shape[-1]):  # t
-        out[:, t * exposure : (t + 1) * exposure] = np.moveaxis(example[:, :, t], 0, -1)
-    if min(spike_x.flatten()) < 0:
-        ticks = [-1, 0, 1]
-        cmap = plt.get_cmap("viridis", 3)
-        # cmaplist = [cmap(i) for i in range(cmap.N)]
-        cmaplist = [cmap(1), cmap(0), cmap(2)]
-        cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
-            "Custom cmap", cmaplist, cmap.N
-        )
-    else:
-        ticks = [0, 1]
-        cmap = plt.get_cmap("viridis", 3)
-        cmaplist = [cmap(i) for i in range(cmap.N)]
-        # cmaplist[0] = (1.0, 1.0, 1.0, 1.0)
-        cmaplist = [cmap(0), cmap(2)]
-        cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
-            "Custom cmap", cmaplist, cmap.N - 1
-        )
-    plt.imshow(out, cmap=cmap)
+    plt.imshow(example.T, cmap=CMAP)
     plt.gca().invert_yaxis()
     plt.ylabel("Frequency bin")
     plt.xlabel("Time [s]")
 
-    plt.colorbar(location="right", ticks=ticks, shrink=0.5 * mode)
+    plt.colorbar(location="right", shrink=0.5 * mode)
     plt.savefig(
         os.path.join(outdir, f"raster_{title}_example_{i}.png"), bbox_inches="tight"
     )
@@ -106,17 +86,14 @@ def plot_example(
     ax2 = fig.add_subplot(gs[1, 0])
     ax3 = fig.add_subplot(gs[1, 1])
     example = spike_x
-    example = example.squeeze(1)  # Remove channel dimension
-    out = np.zeros((frequency_width, stride * exposure))
-    for t in range(example.shape[-1]):  # t
-        out[:, t * exposure : (t + 1) * exposure] = np.moveaxis(example[:, :, t], 0, -1)
-    ax1.imshow(out)
+    # example = example.squeeze(1)  # Remove channel dimension
+    ax1.imshow(spike_x.T, cmap=CMAP)
     ax1.set_title("Spike Train")
     ax1.set_xlabel("Time [s]")
-    pic = ax2.imshow(np.moveaxis(x, 0, -1))
+    pic = ax2.imshow(np.moveaxis(x, 0, -1), cmap=CMAP)
     fig.colorbar(pic, ax=ax2, location="right")
     ax2.set_title("Original Spectrogram")
-    ax3.imshow(np.moveaxis(y, 0, -1))
+    ax3.imshow(np.moveaxis(y, 0, -1), cmap=CMAP)
     ax3.set_title("RFI Mask")
     plt.title(f"Example {i}")
     for ax in [ax1, ax2, ax3]:
@@ -127,21 +104,17 @@ def plot_example(
     plt.close()
 
 
-def setup_config(model, exposure, exposure_mode, stride):
-    config = get_default_params("HERA", model, 128, exposure_mode)
+def setup_config(model, exposure, encoding_method, stride):
+    config = get_default_params("HERA", model, True, encoding_method)
     frequency_width = stride
-    if model == "FC_FORWARD_STEP":
-        frequency_width *= 2
-    if model == "FC_DELTA":
-        exposure = 1
     config["encoder"]["exposure"] = exposure
     return config, frequency_width, exposure
 
 
-def main_single(model, exposure_mode, stride, exposure, limit: int = 10):
+def main_single(model, encoding_method, stride, exposure, limit: int = 10):
     # Load HERA data
     config, frequency_width, exposure = setup_config(
-        model, exposure, exposure_mode, stride
+        model, exposure, encoding_method, stride
     )
     test_x, test_y = load_dataset_examples(config, limit)
     # Create converter
@@ -157,7 +130,7 @@ def main_single(model, exposure_mode, stride, exposure, limit: int = 10):
             stride,
             exposure,
             i,
-            f"{model}" + f"_{exposure_mode}" if exposure_mode else "",
+            f"{model}" + f"_{encoding_method}" if encoding_method else "",
         )
 
 
@@ -199,18 +172,14 @@ def main_mini(
     plot_example_original(test_x, test_y, i, title, outdir=outdir)
 
 
-def main_all(stride, exposure, limit: int = 10, outdir="./"):
+def main_all(stride, limit: int = 10, outdir="./"):
     test_x, test_y = None, None
     with multiprocessing.Pool() as pool:
         for model, exposure_mode, plot_mode in tqdm(
             [
-                ("FC_LATENCY", None, 1),
-                ("FC_RATE", None, 1),
-                ("FC_DELTA", None, 2),
-                ("FC_DELTA_EXPOSURE", None, 1),
-                ("FC_FORWARD_STEP", "first", 2),
-                ("FC_FORWARD_STEP", "direct", 2),
-                ("FC_FORWARD_STEP", "latency", 2),
+                ("LSM", "DIRECT", 1),
+                ("LSM", "RATE_FULL", 1),
+                ("LSM", "LATENCY_FULL", 1),
             ]
         ):
             print(model)
@@ -243,9 +212,9 @@ def main_all(stride, exposure, limit: int = 10, outdir="./"):
 
 
 if __name__ == "__main__":
-    model = "FC_FORWARD_STEP"
-    exposure_mode = "first"
+    model = "LSM"
+    encoding_method = "DIRECT"
     stride = 32
     exposure = 4
-    # main_single(model, exposure_mode, stride, exposure, limit=10)
-    main_all(stride, exposure, limit=1280, outdir="./example_plots")
+    # main_single(model, encoding_method, stride, exposure, limit=10)
+    main_all(stride, limit=1280, outdir="./example_plots")
