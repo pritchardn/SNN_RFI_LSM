@@ -148,6 +148,8 @@ class LSM(pl.LightningModule):
         x, mem, recording = self.model(x)
         if self.readout == "transformer":
             x = self.decoder(x, x)
+        elif self.readout == "relu":
+            x = self.decoder(x)
         else:
             x, mem, recording = self.decoder(x)
         return x, mem, recording
