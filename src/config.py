@@ -366,12 +366,31 @@ DEFAULT_HERA_DIRECT_MEM = {
 }
 
 
+# Readout-only ablation models reuse the encoder/exposure settings of the matching LSM model so the
+# comparison differs only in the absence of the reservoir. The relative variants share the 64-output
+# RATE_REL config, which is what the relative encoders' decoding requires.
+READOUT_ONLY_BASE_MODELS = {
+    "READOUT_LINEAR": "LSM",
+    "READOUT_RELU": "LSM_RELU",
+    "READOUT_TRANSFORMER": "LSM_TRANSFORMER",
+    "READOUT_LINEAR_REL": "LSM_REL",
+    "READOUT_RELU_REL": "LSM_RELU_REL",
+    "READOUT_TRANSFORMER_REL": "LSM_RELU_REL",
+}
+
+
 def get_default_params(
         dataset: str,
         model_type: str,
         delta_normalization: bool = False,
         encoding_method: str = "RATE_FULL",
 ):
+    if model_type in READOUT_ONLY_BASE_MODELS:
+        params = get_default_params(
+            dataset, READOUT_ONLY_BASE_MODELS[model_type], delta_normalization, encoding_method
+        )
+        params["model"]["type"] = model_type
+        return params
     if dataset == "HERA":
         if model_type == "LSM":
             if encoding_method == "LATENCY_FULL":

@@ -38,9 +38,20 @@ from data.spike_converters import (
 from data.utils import reconstruct_patches
 from models.lsm import LSM, LSM3D
 from models.lsm_mem import LSMMembrane
+from models.readout_only import ReadoutOnly
 from evaluation import final_evaluation
 from interfaces.data.raw_data_loader import RawDataLoader
 from interfaces.data.spiking_data_module import SpikeConverter
+
+READOUT_ONLY_MODELS = {
+    "READOUT_LINEAR": "linear",
+    "READOUT_LINEAR_REL": "linear",
+    "READOUT_RELU": "relu",
+    "READOUT_RELU_REL": "relu",
+    "READOUT_TRANSFORMER": "transformer",
+    "READOUT_TRANSFORMER_REL": "transformer",
+}
+
 
 def data_source_from_config(config: dict) -> RawDataLoader:
     data_path = config.get("data_path")
@@ -118,6 +129,12 @@ def model_from_config(config: dict, exposure: int) -> pl.LightningModule:
             readout="transformer",
         )
         return model
+    if model_type in READOUT_ONLY_MODELS:
+        return ReadoutOnly(
+            num_inputs=num_inputs,
+            num_outputs=num_outputs,
+            readout=READOUT_ONLY_MODELS[model_type],
+        )
     if model_type == "LSM_MEM":
         model = LSMMembrane(
             num_inputs=num_inputs,
